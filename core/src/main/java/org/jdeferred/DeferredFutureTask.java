@@ -41,18 +41,18 @@ import org.jdeferred.impl.DeferredObject;
  * @param <P> Type used for {@link Deferred#notify(Object)}
  */
 public class DeferredFutureTask<D, P> extends FutureTask<D> {
-	protected final Deferred<D, Throwable, P> deferred;
+	protected final Deferred<D, P> deferred;
 	protected final StartPolicy startPolicy;
 	
 	public DeferredFutureTask(Callable<D> callable) {
 		super(callable);
-		this.deferred = new DeferredObject<D, Throwable, P>();
+		this.deferred = new DeferredObject<D, P>();
 		this.startPolicy = StartPolicy.DEFAULT;
 	}
 	
 	public DeferredFutureTask(Runnable runnable) {
 		super(runnable, null);
-		this.deferred = new DeferredObject<D, Throwable, P>();
+		this.deferred = new DeferredObject<D, P>();
 		this.startPolicy = StartPolicy.DEFAULT;
 	}
 	
@@ -65,11 +65,11 @@ public class DeferredFutureTask<D, P> extends FutureTask<D> {
 	@SuppressWarnings("unchecked")
 	public DeferredFutureTask(DeferredRunnable<P> runnable) {
 		super(runnable, null);
-		this.deferred = (Deferred<D, Throwable, P>) runnable.getDeferred();
+		this.deferred = (Deferred<D, P>) runnable.getDeferred();
 		this.startPolicy = runnable.getStartPolicy();
 	}
 	
-	public Promise<D, Throwable, P> promise() {
+	public Promise<D, P> promise() {
 		return deferred.promise();
 	}
 	

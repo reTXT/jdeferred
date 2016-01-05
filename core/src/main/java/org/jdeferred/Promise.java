@@ -50,7 +50,7 @@ package org.jdeferred;
  * @param <P>
  *            Type used for {@link #progress(ProgressCallback)}
  */
-public interface Promise<D, F, P> {
+public interface Promise<D, P> {
 	public enum State {
 		/**
 		 * The Promise is still pending - it could be created, submitted for execution,
@@ -101,7 +101,7 @@ public interface Promise<D, F, P> {
 	 * @param doneCallback {@link #done(DoneCallback)}
 	 * @return
 	 */
-	public Promise<D, F, P> then(DoneCallback<D> doneCallback);
+	public Promise<D, P> then(DoneCallback<D> doneCallback);
 
 	/**
 	 * Equivalent to {@link #done(DoneCallback)} and then {@link FailCallback}
@@ -109,8 +109,8 @@ public interface Promise<D, F, P> {
 	 * @param failCallback {@link #fail(FailCallback)}
 	 * @return
 	 */
-	public Promise<D, F, P> then(DoneCallback<D> doneCallback,
-			FailCallback<F> failCallback);
+	public Promise<D, P> then(DoneCallback<D> doneCallback,
+			FailCallback failCallback);
 
 	/**
 	 * Equivalent to {@link #done(DoneCallback)}, then {@link FailCallback}, then {@link #progress(ProgressCallback)}
@@ -120,8 +120,8 @@ public interface Promise<D, F, P> {
 	 * @param progressCallback {@link #progress(ProgressCallback)}
 	 * @return
 	 */
-	public Promise<D, F, P> then(DoneCallback<D> doneCallback,
-			FailCallback<F> failCallback, ProgressCallback<P> progressCallback);
+	public Promise<D, P> then(DoneCallback<D> doneCallback,
+			FailCallback failCallback, ProgressCallback<P> progressCallback);
 	
 	/**
 	 * Equivalent to then(doneFilter, null, null)
@@ -129,7 +129,7 @@ public interface Promise<D, F, P> {
 	 * @param doneFilter
 	 * @return
 	 */
-	public <D_OUT, F_OUT, P_OUT> Promise<D_OUT, F_OUT, P_OUT> then(
+	public <D_OUT, P_OUT> Promise<D_OUT, P_OUT> then(
 			DoneFilter<D, D_OUT> doneFilter);
 
 	/**
@@ -139,8 +139,8 @@ public interface Promise<D, F, P> {
 	 * @param failFilter
 	 * @return
 	 */
-	public <D_OUT, F_OUT, P_OUT> Promise<D_OUT, F_OUT, P_OUT> then(
-			DoneFilter<D, D_OUT> doneFilter, FailFilter<F, F_OUT> failFilter);
+	public <D_OUT, P_OUT> Promise<D_OUT, P_OUT> then(
+			DoneFilter<D, D_OUT> doneFilter, FailFilter failFilter);
 
 	/**
 	 * If any of the filter is not specified, a default No Op filter would be used.
@@ -171,8 +171,8 @@ public interface Promise<D, F, P> {
 	 * @param progressFilter if null, use {@link NoOpProgressFilter}
 	 * @return
 	 */
-	public <D_OUT, F_OUT, P_OUT> Promise<D_OUT, F_OUT, P_OUT> then(
-			DoneFilter<D, D_OUT> doneFilter, FailFilter<F, F_OUT> failFilter,
+	public <D_OUT, P_OUT> Promise<D_OUT, P_OUT> then(
+			DoneFilter<D, D_OUT> doneFilter, FailFilter failFilter,
 			ProgressFilter<P, P_OUT> progressFilter);
 	
 	/**
@@ -181,8 +181,8 @@ public interface Promise<D, F, P> {
 	 * @param donePipe
 	 * @return
 	 */
-	public <D_OUT, F_OUT, P_OUT> Promise<D_OUT, F_OUT, P_OUT> then(
-			DonePipe<D, D_OUT, F_OUT, P_OUT> donePipe);
+	public <D_OUT, P_OUT> Promise<D_OUT, P_OUT> then(
+			DonePipe<D, D_OUT, P_OUT> donePipe);
 	
 	/**
 	 * Equivalent to then(DonePipe, FailPipe, null)
@@ -191,8 +191,8 @@ public interface Promise<D, F, P> {
 	 * @param failPipe
 	 * @return
 	 */
-	public <D_OUT, F_OUT, P_OUT> Promise<D_OUT, F_OUT, P_OUT> then(
-			DonePipe<D, D_OUT, F_OUT, P_OUT> donePipe, FailPipe<F, D_OUT, F_OUT, P_OUT> failPipe);
+	public <D_OUT, P_OUT> Promise<D_OUT, P_OUT> then(
+			DonePipe<D, D_OUT, P_OUT> donePipe, FailPipe<D_OUT, P_OUT> failPipe);
 	
 	/**
 	 * This method is similar to JQuery's pipe() method, where a new {@link Promise} is returned
@@ -221,9 +221,9 @@ public interface Promise<D, F, P> {
 	 * @param progressPipe
 	 * @return
 	 */
-	public <D_OUT, F_OUT, P_OUT> Promise<D_OUT, F_OUT, P_OUT> then(
-			DonePipe<D, D_OUT, F_OUT, P_OUT> donePipe, FailPipe<F, D_OUT, F_OUT, P_OUT> failPipe,
-			ProgressPipe<P, D_OUT, F_OUT, P_OUT> progressPipe);
+	public <D_OUT, P_OUT> Promise<D_OUT, P_OUT> then(
+			DonePipe<D, D_OUT, P_OUT> donePipe, FailPipe<D_OUT, P_OUT> failPipe,
+			ProgressPipe<P, D_OUT, P_OUT> progressPipe);
 	
 	/**
 	 * This method will register {@link DoneCallback} so that when a Deferred object 
@@ -246,7 +246,7 @@ public interface Promise<D, F, P> {
 	 * @param callback
 	 * @return
 	 */
-	public Promise<D, F, P> done(DoneCallback<D> callback);
+	public Promise<D, P> done(DoneCallback<D> callback);
 	
 	/**
 	 * This method will register {@link FailCallback} so that when a Deferred object 
@@ -269,7 +269,7 @@ public interface Promise<D, F, P> {
 	 * @param callback
 	 * @return
 	 */
-	public Promise<D, F, P> fail(FailCallback<F> callback);
+	public Promise<D, P> fail(FailCallback callback);
 	
 	/**
 	 * This method will register {@link AlwaysCallback} so that when it's always triggered
@@ -297,8 +297,10 @@ public interface Promise<D, F, P> {
 	 * @param callback
 	 * @return
 	 */
-	public Promise<D, F, P> always(AlwaysCallback<D, F> callback);
-	
+	public Promise<D, P> always(AlwaysCallback<D> callback);
+
+	public Promise<D, P> always(Runnable callback);
+
 	/**
 	 * This method will register {@link ProgressCallback} so that when a Deferred object 
 	 * is notified of progress ({@link Deferred#notify(Object)}), {@link ProgressCallback} will be triggered.
@@ -320,8 +322,8 @@ public interface Promise<D, F, P> {
 	 * @param callback
 	 * @return
 	 */
-	public Promise<D, F, P> progress(ProgressCallback<P> callback);
-	
+	public Promise<D, P> progress(ProgressCallback<P> callback);
+
 	/**
 	 * This method will wait as long as the State is Pending.  This method will fail fast
 	 * when State is not Pending.

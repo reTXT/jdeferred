@@ -16,7 +16,7 @@ import org.jdeferred.impl.DeferredObject;
  * @param <P> Type used for {@link Deferred#notify(Object)}
  */
 public abstract class DeferredCallable<D, P> implements Callable<D> {
-	private final Deferred<D, Throwable, P> deferred = new DeferredObject<D, Throwable, P>();
+	private final Deferred<D, P> deferred = new DeferredObject<D, P>();
 	private final StartPolicy startPolicy;
 	
 	public DeferredCallable() {
@@ -35,7 +35,7 @@ public abstract class DeferredCallable<D, P> implements Callable<D> {
 		deferred.notify(progress);
 	}
 	
-	protected Deferred<D, Throwable, P> getDeferred() {
+	protected Deferred<D, P> getDeferred() {
 		return deferred;
 	}
 

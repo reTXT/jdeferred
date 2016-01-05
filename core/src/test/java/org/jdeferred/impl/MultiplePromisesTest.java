@@ -103,11 +103,11 @@ public class MultiplePromisesTest extends AbstractDeferredTest {
 				Assert.assertEquals("Hello", results.get(1).getResult());
 				doneCount.incrementAndGet();
 			}
-		}).always(new AlwaysCallback<MultipleResults, OneReject>() {
+		}).always(new AlwaysCallback<MultipleResults>() {
 
 			@Override
 			public void onAlways(State state, MultipleResults results,
-					OneReject rejected) {
+					Throwable rejected) {
 				Assert.assertEquals(2, results.size());
 				Assert.assertEquals(100, results.get(0).getResult());
 				Assert.assertEquals("Hello", results.get(1).getResult());
@@ -147,9 +147,10 @@ public class MultiplePromisesTest extends AbstractDeferredTest {
 			public void onDone(MultipleResults results) {
 				doneCount.incrementAndGet();
 			}
-		}).fail(new FailCallback<OneReject>() {
-			public void onFail(OneReject result) {
-				Assert.assertEquals(0, result.getIndex());
+		}).fail(new FailCallback() {
+			public void onFail(Throwable result) {
+			    OneReject orResult = (OneReject) result;
+				Assert.assertEquals(0, orResult.getIndex());
 				failCount.incrementAndGet();
 			}
 		});
@@ -204,8 +205,8 @@ public class MultiplePromisesTest extends AbstractDeferredTest {
 				Assert.assertEquals("Hello", results.get(1).getResult());
 				doneCount.incrementAndGet();
 			}
-		}).fail(new FailCallback<OneReject>() {
-			public void onFail(OneReject result) {
+		}).fail(new FailCallback() {
+			public void onFail(Throwable result) {
 				failCount.incrementAndGet();
 			}
 		});
@@ -264,8 +265,8 @@ public class MultiplePromisesTest extends AbstractDeferredTest {
 					Assert.assertEquals(null, results.get(1).getResult());
 					doneCounter.incrementAndGet();
 				}
-			}).fail(new FailCallback<OneReject>() {
-				public void onFail(OneReject result) {
+			}).fail(new FailCallback() {
+				public void onFail(Throwable result) {
 					Assert.fail("Shouldn't be here");
 				}
 			}).progress(new ProgressCallback<MasterProgress>() {
@@ -284,10 +285,10 @@ public class MultiplePromisesTest extends AbstractDeferredTest {
 						combinedProgressCounter.incrementAndGet();
 					}
 				}
-			}).always(new AlwaysCallback<MultipleResults, OneReject>() {
+			}).always(new AlwaysCallback<MultipleResults>() {
 				@Override
 				public void onAlways(State state, MultipleResults results,
-						OneReject rejected) {
+						Throwable rejected) {
 					Assert.assertEquals(State.RESOLVED, state);
 					Assert.assertEquals(2, results.size());
 					Assert.assertEquals(55, results.get(0).getResult());
@@ -335,7 +336,7 @@ public class MultiplePromisesTest extends AbstractDeferredTest {
 	public void testMultipleWait() {
 		final AtomicInteger doneCount = new AtomicInteger();
 		
-		Promise<MultipleResults, OneReject, MasterProgress> p = deferredManager.when(new Callable<Integer>() {
+		Promise<MultipleResults, MasterProgress> p = deferredManager.when(new Callable<Integer>() {
 			public Integer call() {
 				try {
 					Thread.sleep(1000);
@@ -378,7 +379,7 @@ public class MultiplePromisesTest extends AbstractDeferredTest {
 	public void testMultipleWaitSafely() {
 		final AtomicInteger doneCount = new AtomicInteger();
 		
-		Promise<MultipleResults, OneReject, MasterProgress> p = deferredManager.when(new Callable<Integer>() {
+		Promise<MultipleResults, MasterProgress> p = deferredManager.when(new Callable<Integer>() {
 			public Integer call() {
 				try {
 					Thread.sleep(1000);

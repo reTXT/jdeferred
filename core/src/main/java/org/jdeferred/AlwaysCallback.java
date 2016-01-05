@@ -17,6 +17,6 @@ package org.jdeferred;
 
 import org.jdeferred.Promise.State;
 
-public interface AlwaysCallback<D, R> {
-	public void onAlways(final State state, final D resolved, final R rejected);
+public interface AlwaysCallback<D> {
+	public void onAlways(final State state, final D resolved, final Throwable rejected);
 }

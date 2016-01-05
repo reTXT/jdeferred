@@ -44,8 +44,8 @@ import org.jdeferred.impl.DeferredObject;
  */
 @SuppressWarnings("rawtypes")
 public class MasterDeferredObject extends
-		DeferredObject<MultipleResults, OneReject, MasterProgress>
-		implements Promise<MultipleResults, OneReject, MasterProgress> {
+		DeferredObject<MultipleResults, MasterProgress>
+		implements Promise<MultipleResults, MasterProgress> {
 	private final int numberOfPromises;
 	private final AtomicInteger doneCount = new AtomicInteger();
 	private final AtomicInteger failCount = new AtomicInteger();
@@ -61,8 +61,8 @@ public class MasterDeferredObject extends
 		int count = 0;
 		for (final Promise promise : promises) {
 			final int index = count++;
-			promise.fail(new FailCallback<Object>() {
-				public void onFail(Object result) {
+			promise.fail(new FailCallback() {
+				public void onFail(Throwable result) {
 					synchronized (MasterDeferredObject.this) {
 						if (!MasterDeferredObject.this.isPending())
 							return;

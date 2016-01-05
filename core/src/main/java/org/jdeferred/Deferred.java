@@ -32,7 +32,7 @@ import org.jdeferred.impl.DeferredObject;
  * @param <P>
  *            Type used for {@link #notify(Object)}
  */
-public interface Deferred<D, F, P> extends Promise<D, F, P> {
+public interface Deferred<D, P> extends Promise<D, P> {
 	/**
 	 * This should be called when a task has completed successfully.
 	 * 
@@ -52,10 +52,10 @@ public interface Deferred<D, F, P> extends Promise<D, F, P> {
 	 * </code>
 	 * </pre>
 	 * 
-	 * @param resolve
-	 * @return
+	 * @param resolve resolved value
+	 * @return chainable deferred object
 	 */
-	Deferred<D, F, P> resolve(final D resolve);
+	Deferred<D, P> resolve(final D resolve);
 
 	/**
 	 * This should be called when a task has completed unsuccessfully, 
@@ -77,15 +77,15 @@ public interface Deferred<D, F, P> extends Promise<D, F, P> {
 	 * </code>
 	 * </pre>
 	 * 
-	 * @param resolve
-	 * @return
+     * @param reject rejected value
+     * @return chainable deferred object
 	 */
-	Deferred<D, F, P> reject(final F reject);
+	Deferred<D, P> reject(final Throwable reject);
 
 	/**
 	 * This should be called when a task is still executing and progress had been made, 
 	 * E.g., during a file download, notify the download progress.
-	 * 
+	 *
 	 * <pre>
 	 * <code>
 	 * {@link Deferred} deferredObject = new {@link DeferredObject}();
@@ -95,22 +95,22 @@ public interface Deferred<D, F, P> extends Promise<D, F, P> {
 	 *   	// Failed :(
 	 *   }
 	 * });
-	 * 
+	 *
 	 * // another thread using the same deferredObject
 	 * deferredObject.reject("100%");
-	 * 
+	 *
 	 * </code>
 	 * </pre>
-	 * 
-	 * @param resolve
-	 * @return
+	 *
+	 * @param progress progress value
+	 * @return chainable deferred object
 	 */
-	Deferred<D, F, P> notify(final P progress);
+	Deferred<D, P> notify(final P progress);
 
 	/**
 	 * Return an {@link Promise} instance (i.e., an observer).  You can register callbacks in this observer.
 	 * 
-	 * @return
+	 * @return a {@link Promise} instance (i.e., an observer).  You can register callbacks in this observer.
 	 */
-	Promise<D, F, P> promise();
+	Promise<D, P> promise();
 }

@@ -44,11 +44,10 @@ public class FailureTest extends AbstractDeferredTest {
 				counter.incrementAndGet();
 			}
 		}).fail(new FailCallback() {
-			public void onFail(Object result) {
+			public void onFail(Throwable result) {
 				Assert.fail("Shouldn't be here");
 			}
-		}).always(new AlwaysCallback<Integer, Throwable>() {
-			
+		}).always(new AlwaysCallback<Integer>() {
 			@Override
 			public void onAlways(State state, Integer resolved, Throwable rejected) {
 				counter.incrementAndGet();
@@ -61,7 +60,7 @@ public class FailureTest extends AbstractDeferredTest {
 	
 	@Test
 	public void testResolvingTwice() {
-		Deferred<Integer, Void, Void> deferred = new DeferredObject<Integer, Void, Void>();
+		Deferred<Integer, Void> deferred = new DeferredObject<Integer, Void>();
 		deferred.done(new DoneCallback<Integer>() {
 
 			@Override
@@ -84,14 +83,14 @@ public class FailureTest extends AbstractDeferredTest {
 	public void testResolvingTwiceInThread() {
 		final AtomicBoolean exceptionCaught = new AtomicBoolean();
 		
-		final Deferred<Integer, Void, Void> deferred = new DeferredObject<Integer, Void, Void>();
+		final Deferred<Integer, Void> deferred = new DeferredObject<Integer, Void>();
 		deferredManager.when(new Runnable() {
 			@Override
 			public void run() {
 				deferred.resolve(0);
 				deferred.resolve(1);
 			}
-		}).fail(new FailCallback<Throwable>() {
+		}).fail(new FailCallback() {
 
 			@Override
 			public void onFail(Throwable result) {

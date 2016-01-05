@@ -15,7 +15,6 @@
  */
 package org.jdeferred.impl;
 
-import org.jdeferred.Deferred;
 import org.jdeferred.DoneCallback;
 import org.jdeferred.DonePipe;
 import org.jdeferred.FailCallback;
@@ -24,8 +23,10 @@ import org.jdeferred.ProgressCallback;
 import org.jdeferred.ProgressPipe;
 import org.jdeferred.Promise;
 
-public class PipedPromise<D, F, P, D_OUT, F_OUT, P_OUT> extends DeferredObject<D_OUT, F_OUT, P_OUT> implements Promise<D_OUT, F_OUT, P_OUT>{
-	public PipedPromise(final Promise<D, F, P> promise, final DonePipe<D, D_OUT, F_OUT, P_OUT> doneFilter, final FailPipe<F, D_OUT, F_OUT, P_OUT> failFilter, final ProgressPipe<P, D_OUT, F_OUT, P_OUT> progressFilter) {
+import java.util.concurrent.CancellationException;
+
+public class PipedPromise<D, P, D_OUT, P_OUT> extends DeferredObject<D_OUT, P_OUT> implements Promise<D_OUT, P_OUT>{
+	public PipedPromise(final Promise<D, P> promise, final DonePipe<D, D_OUT, P_OUT> donePipe, final FailPipe<D_OUT, P_OUT> failPipe, final ProgressPipe<P, D_OUT, P_OUT> progressPipe) {
 		promise.done(new DoneCallback<D>() {
 			@SuppressWarnings("unchecked")
 			@Override
@@ -34,10 +35,9 @@ public class PipedPromise<D, F, P, D_OUT, F_OUT, P_OUT> extends DeferredObject<D
 				else PipedPromise.this.resolve((D_OUT) result);
 				
 			}
-		}).fail(new FailCallback<F>() {
-			@SuppressWarnings("unchecked")
+		}).fail(new FailCallback() {
 			@Override
-			public void onFail(F result) {
+			public void onFail(Throwable result) {
 				if (failFilter != null)  pipe(failFilter.pipeFail(result));
 				else PipedPromise.this.reject((F_OUT) result);
 			}
@@ -51,7 +51,7 @@ public class PipedPromise<D, F, P, D_OUT, F_OUT, P_OUT> extends DeferredObject<D
 		});
 	}
 	
-	protected Promise<D_OUT, F_OUT, P_OUT> pipe(Promise<D_OUT, F_OUT, P_OUT> promise) {
+	protected Promise<D_OUT, P_OUT> pipe(Promise<D_OUT, P_OUT> promise) {
 		promise.done(new DoneCallback<D_OUT>() {
 			@Override
 			public void onDone(D_OUT result) {

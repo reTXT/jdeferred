@@ -26,7 +26,6 @@ import org.jdeferred.impl.DefaultDeferredManager;
 import org.jdeferred.multiple.MasterDeferredObject;
 import org.jdeferred.multiple.MasterProgress;
 import org.jdeferred.multiple.MultipleResults;
-import org.jdeferred.multiple.OneReject;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
@@ -80,7 +79,7 @@ public class AndroidDeferredManager extends DefaultDeferredManager {
 	 * @see {@link AsyncTask#executeOnExecutor(java.util.concurrent.Executor, Object...)}
 	 */
 	@SuppressLint("NewApi")
-	public <Progress, Result> Promise<Result, Throwable, Progress> when(
+	public <Progress, Result> Promise<Result, Progress> when(
 			DeferredAsyncTask<Void, Progress, Result> task) {
 		
 		if (task.getStartPolicy() == StartPolicy.AUTO 
@@ -97,7 +96,7 @@ public class AndroidDeferredManager extends DefaultDeferredManager {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public Promise<MultipleResults, OneReject, MasterProgress> when(
+	public Promise<MultipleResults, MasterProgress> when(
 			DeferredAsyncTask<Void, ?, ?> ... tasks) {
 		assertNotEmpty(tasks);
 		
@@ -111,7 +110,7 @@ public class AndroidDeferredManager extends DefaultDeferredManager {
 	}
 	
 	@SuppressWarnings("rawtypes")
-    public Promise<MultipleResults, OneReject, MasterProgress> when(AndroidExecutionScope scope,
+    public Promise<MultipleResults, MasterProgress> when(AndroidExecutionScope scope,
             DeferredAsyncTask<Void, ?, ?> ... tasks) {
         assertNotEmpty(tasks);
         Promise[] promises = new Promise[tasks.length];
@@ -140,8 +139,8 @@ public class AndroidDeferredManager extends DefaultDeferredManager {
 	 * </ul>
 	 */
 	@Override
-	public <D, P> Promise<D, Throwable, P> when(DeferredFutureTask<D, P> task) {
-		return new AndroidDeferredObject<D, Throwable, P>(super.when(task)).promise();
+	public <D, P> Promise<D, P> when(DeferredFutureTask<D, P> task) {
+		return new AndroidDeferredObject<D, P>(super.when(task)).promise();
 	}
 	
 	/**
@@ -149,11 +148,11 @@ public class AndroidDeferredManager extends DefaultDeferredManager {
 	 * so that callbacks can be executed in the UI thread.
 	 */
 	@Override
-	public <D, F, P> Promise<D, F, P> when(Promise<D, F, P> promise) {
+	public <D, P> Promise<D, P> when(Promise<D, P> promise) {
 		if (promise instanceof AndroidDeferredObject) {
 			return promise;
 		}
-		return new AndroidDeferredObject<D, F, P>(promise).promise();
+		return new AndroidDeferredObject<D, P>(promise).promise();
 	}
 
 	/**
@@ -163,11 +162,11 @@ public class AndroidDeferredManager extends DefaultDeferredManager {
 	 * @param promise A promise
 	 * @return A promise wrapped in @{link AndroidDeferredObject}
 	 */
-    public <D, F, P> Promise<D, F, P> when(Promise<D, F, P> promise, AndroidExecutionScope scope) {
+    public <D, P> Promise<D, P> when(Promise<D, P> promise, AndroidExecutionScope scope) {
         if (promise instanceof AndroidDeferredObject) {
             return promise;
         }
-        return new AndroidDeferredObject<D, F, P>(promise, scope).promise();
+        return new AndroidDeferredObject<D, P>(promise, scope).promise();
     }
 
 	/**
@@ -176,8 +175,8 @@ public class AndroidDeferredManager extends DefaultDeferredManager {
 	 */
 	@SuppressWarnings({ "rawtypes" })
 	@Override
-	public Promise<MultipleResults, OneReject, MasterProgress> when(Promise... promises) {
-		return new AndroidDeferredObject<MultipleResults, OneReject, MasterProgress>
+	public Promise<MultipleResults, MasterProgress> when(Promise... promises) {
+		return new AndroidDeferredObject<MultipleResults, MasterProgress>
 			(super.when(promises)).promise();
 	}
 
@@ -187,8 +186,8 @@ public class AndroidDeferredManager extends DefaultDeferredManager {
 	 * @return A promise wrapped in @{link AndroidDeferredObject}
 	 */
 	@SuppressWarnings({ "rawtypes" })
-    public Promise<MultipleResults, OneReject, MasterProgress> when(AndroidExecutionScope scope, Promise... promises) {
-        return new AndroidDeferredObject<MultipleResults, OneReject, MasterProgress>
+    public Promise<MultipleResults, MasterProgress> when(AndroidExecutionScope scope, Promise... promises) {
+        return new AndroidDeferredObject<MultipleResults, MasterProgress>
             (super.when(promises), scope).promise();
     }
 }

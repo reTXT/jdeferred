@@ -42,7 +42,7 @@ public class SinglePromiseTest extends AbstractDeferredTest {
 						holder.set((Integer) result);
 					}
 				}).fail(new FailCallback() {
-					public void onFail(Object result) {
+					public void onFail(Throwable result) {
 						failCount.incrementAndGet();
 					}
 				});
@@ -63,7 +63,7 @@ public class SinglePromiseTest extends AbstractDeferredTest {
 						doneCount.incrementAndGet();
 					}
 				}).fail(new FailCallback() {
-					public void onFail(Object result) {
+					public void onFail(Throwable result) {
 						failCount.incrementAndGet();
 					}
 				});
@@ -81,7 +81,7 @@ public class SinglePromiseTest extends AbstractDeferredTest {
 					public void onDone(Object result) {
 						Assert.fail("Should not be here");
 					}
-				}).fail(new FailCallback<Throwable>() {
+				}).fail(new FailCallback() {
 					public void onFail(Throwable result) {
 						counter.incrementAndGet();
 						Assert.assertEquals("oops", result.getMessage());
@@ -102,7 +102,7 @@ public class SinglePromiseTest extends AbstractDeferredTest {
 				holder.set((Integer) result);
 			}
 		}).fail(new FailCallback() {
-			public void onFail(Object result) {
+			public void onFail(Throwable result) {
 				failCount.incrementAndGet();
 			}
 		});
@@ -125,10 +125,10 @@ public class SinglePromiseTest extends AbstractDeferredTest {
 						holder.set((Integer) result);
 					}
 				}).fail(new FailCallback() {
-					public void onFail(Object result) {
+					public void onFail(Throwable result) {
 						failCount.incrementAndGet();
 					}
-				}).always(new AlwaysCallback<Integer, Throwable>() {
+				}).always(new AlwaysCallback<Integer>() {
 					@Override
 					public void onAlways(State state, Integer resolved,
 							Throwable rejected) {
@@ -156,12 +156,12 @@ public class SinglePromiseTest extends AbstractDeferredTest {
 					public void onDone(Object result) {
 						doneCount.incrementAndGet();
 					}
-				}).fail(new FailCallback<Throwable>() {
+				}).fail(new FailCallback() {
 					public void onFail(Throwable result) {
 						Assert.assertEquals("oops", result.getMessage());
 						failCount.incrementAndGet();
 					}
-				}).always(new AlwaysCallback<Void, Throwable>() {
+				}).always(new AlwaysCallback<Void>() {
 					@Override
 					public void onAlways(State state, Void resolved,
 							Throwable rejected) {
@@ -207,7 +207,7 @@ public class SinglePromiseTest extends AbstractDeferredTest {
 				holder.set((Integer) result);
 			}
 		}).fail(new FailCallback() {
-			public void onFail(Object result) {
+			public void onFail(Throwable result) {
 				failCount.incrementAndGet();
 			}
 		}).progress(new ProgressCallback() {
@@ -238,7 +238,7 @@ public class SinglePromiseTest extends AbstractDeferredTest {
 		Future<Void> failedFuture = es.submit(failedCallable(
 				new RuntimeException("oops"), 300));
 		final AtomicInteger failCount = new AtomicInteger();
-		deferredManager.when(failedFuture).fail(new FailCallback<Throwable>() {
+		deferredManager.when(failedFuture).fail(new FailCallback() {
 			@Override
 			public void onFail(Throwable result) {
 				Assert.assertEquals("oops", result.getCause());
@@ -254,14 +254,14 @@ public class SinglePromiseTest extends AbstractDeferredTest {
 	public void testWait() {
 		final ValueHolder<Integer> holder = new ValueHolder<Integer>();
 		final AtomicInteger failCount = new AtomicInteger();
-		Promise<Integer, Throwable, Void> p = deferredManager
+		Promise<Integer, Void> p = deferredManager
 				.when(successCallable(100, 1000)).done(new DoneCallback() {
 					public void onDone(Object result) {
 						Assert.assertEquals(result, 100);
 						holder.set((Integer) result);
 					}
 				}).fail(new FailCallback() {
-					public void onFail(Object result) {
+					public void onFail(Throwable result) {
 						failCount.incrementAndGet();
 					}
 				});
@@ -284,14 +284,14 @@ public class SinglePromiseTest extends AbstractDeferredTest {
 	public void testWaitSafely() {
 		final ValueHolder<Integer> holder = new ValueHolder<Integer>();
 		final AtomicInteger failCount = new AtomicInteger();
-		Promise<Integer, Throwable, Void> p = deferredManager
+		Promise<Integer, Void> p = deferredManager
 				.when(successCallable(100, 1000)).done(new DoneCallback() {
 					public void onDone(Object result) {
 						Assert.assertEquals(result, 100);
 						holder.set((Integer) result);
 					}
 				}).fail(new FailCallback() {
-					public void onFail(Object result) {
+					public void onFail(Throwable result) {
 						failCount.incrementAndGet();
 					}
 				});

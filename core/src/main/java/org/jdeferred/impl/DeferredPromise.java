@@ -28,11 +28,11 @@ import org.jdeferred.ProgressFilter;
 import org.jdeferred.ProgressPipe;
 import org.jdeferred.Promise;
 
-public class DeferredPromise<D, F, P> implements Promise<D, F, P> {
-	private final Promise<D, F, P> promise;
-	protected final Deferred<D, F, P> deferred;
+public class DeferredPromise<D, P> implements Promise<D, P> {
+	private final Promise<D, P> promise;
+	protected final Deferred<D, P> deferred;
 	
-	public DeferredPromise(Deferred<D, F, P> deferred) {
+	public DeferredPromise(Deferred<D, P> deferred) {
 		this.deferred = deferred;
 		this.promise = deferred.promise();
 	}
@@ -57,45 +57,49 @@ public class DeferredPromise<D, F, P> implements Promise<D, F, P> {
 		return promise.then(doneCallback);
 	}
 
-	public Promise<D, F, P> then(DoneCallback<D> doneCallback,
-			FailCallback<F> failCallback) {
+	public Promise<D, P> then(DoneCallback<D> doneCallback,
+			FailCallback failCallback) {
 		return promise.then(doneCallback, failCallback);
 	}
 
-	public Promise<D, F, P> then(DoneCallback<D> doneCallback,
-			FailCallback<F> failCallback, ProgressCallback<P> progressCallback) {
+	public Promise<D, P> then(DoneCallback<D> doneCallback,
+			FailCallback failCallback, ProgressCallback<P> progressCallback) {
 		return promise.then(doneCallback, failCallback, progressCallback);
 	}
 
-	public <D_OUT, F_OUT, P_OUT> Promise<D_OUT, F_OUT, P_OUT> then(
+	public <D_OUT, P_OUT> Promise<D_OUT, P_OUT> then(
 			DoneFilter<D, D_OUT> doneFilter) {
 		return promise.then(doneFilter);
 	}
 
-	public <D_OUT, F_OUT, P_OUT> Promise<D_OUT, F_OUT, P_OUT> then(
-			DoneFilter<D, D_OUT> doneFilter, FailFilter<F, F_OUT> failFilter) {
+	public <D_OUT, P_OUT> Promise<D_OUT, P_OUT> then(
+			DoneFilter<D, D_OUT> doneFilter, FailFilter failFilter) {
 		return promise.then(doneFilter, failFilter);
 	}
 
-	public <D_OUT, F_OUT, P_OUT> Promise<D_OUT, F_OUT, P_OUT> then(
-			DoneFilter<D, D_OUT> doneFilter, FailFilter<F, F_OUT> failFilter,
+	public <D_OUT, P_OUT> Promise<D_OUT, P_OUT> then(
+			DoneFilter<D, D_OUT> doneFilter, FailFilter failFilter,
 			ProgressFilter<P, P_OUT> progressFilter) {
 		return promise.then(doneFilter, failFilter, progressFilter);
 	}
 
-	public Promise<D, F, P> done(DoneCallback<D> callback) {
+	public Promise<D, P> done(DoneCallback<D> callback) {
 		return promise.done(callback);
 	}
 
-	public Promise<D, F, P> fail(FailCallback<F> callback) {
+	public Promise<D, P> fail(FailCallback callback) {
 		return promise.fail(callback);
 	}
 
-	public Promise<D, F, P> always(AlwaysCallback<D, F> callback) {
+	public Promise<D, P> always(AlwaysCallback<D> callback) {
 		return promise.always(callback);
 	}
 
-	public Promise<D, F, P> progress(ProgressCallback<P> callback) {
+	public Promise<D, P> always(Runnable runnable) {
+		return promise.always(runnable);
+	}
+
+	public Promise<D, P> progress(ProgressCallback<P> callback) {
 		return promise.progress(callback);
 	}
 
@@ -111,23 +115,23 @@ public class DeferredPromise<D, F, P> implements Promise<D, F, P> {
 	}
 
 	@Override
-	public <D_OUT, F_OUT, P_OUT> Promise<D_OUT, F_OUT, P_OUT> then(
-			DonePipe<D, D_OUT, F_OUT, P_OUT> doneFilter) {
+	public <D_OUT, P_OUT> Promise<D_OUT, P_OUT> then(
+			DonePipe<D, D_OUT, P_OUT> doneFilter) {
 		return promise.then(doneFilter);
 	}
 
 	@Override
-	public <D_OUT, F_OUT, P_OUT> Promise<D_OUT, F_OUT, P_OUT> then(
-			DonePipe<D, D_OUT, F_OUT, P_OUT> doneFilter,
-			FailPipe<F, D_OUT, F_OUT, P_OUT> failFilter) {
+	public <D_OUT, P_OUT> Promise<D_OUT, P_OUT> then(
+			DonePipe<D, D_OUT, P_OUT> doneFilter,
+			FailPipe<D_OUT, P_OUT> failFilter) {
 		return promise.then(doneFilter, failFilter);
 	}
 
 	@Override
-	public <D_OUT, F_OUT, P_OUT> Promise<D_OUT, F_OUT, P_OUT> then(
-			DonePipe<D, D_OUT, F_OUT, P_OUT> doneFilter,
-			FailPipe<F, D_OUT, F_OUT, P_OUT> failFilter,
-			ProgressPipe<P, D_OUT, F_OUT, P_OUT> progressFilter) {
+	public <D_OUT, P_OUT> Promise<D_OUT, P_OUT> then(
+			DonePipe<D, D_OUT, P_OUT> doneFilter,
+			FailPipe<D_OUT, P_OUT> failFilter,
+			ProgressPipe<P, D_OUT, P_OUT> progressFilter) {
 		return promise.then(doneFilter, failFilter, progressFilter);
 	}
 }

@@ -22,6 +22,6 @@ package org.jdeferred;
  * @param <P> Type of the input
  * @param <P_OUT> Type of the output from this filter
  */
-public interface FailFilter<F, F_OUT> {
-	public F_OUT filterFail(final F result);
+public interface FailFilter {
+	public Throwable filterFail(final Throwable result);
 }

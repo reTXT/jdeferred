@@ -56,7 +56,7 @@ public class FilteredPromiseTest extends AbstractDeferredTest {
 				return "DONE2";
 			}
 		})
-		.<String, Throwable, Void>then(null, new FilteredPromise.NoOpFailFilter<Throwable>())
+		.<String, Void>then(null, new FilteredPromise.NoOpFailFilter())
 		.done(new DoneCallback<String>() {
 			@Override
 			public void onDone(String result) {
@@ -71,8 +71,8 @@ public class FilteredPromiseTest extends AbstractDeferredTest {
 				throw new RuntimeException("FAIL");
 			}
 		})
-		.<String, Throwable, Void>then(null, null, new FilteredPromise.NoOpProgressFilter<Void>())
-		.fail(new FailCallback<Throwable>() {
+		.<String, Void>then(null, null, new FilteredPromise.NoOpProgressFilter<Void>())
+		.fail(new FailCallback() {
 			@Override
 			public void onFail(Throwable result) {
 				Assert.assertEquals("FAIL", result.getMessage());
@@ -145,15 +145,15 @@ public class FilteredPromiseTest extends AbstractDeferredTest {
 			}
 		};
 		
-		deferredManager.when(task).then(null, new FailFilter<Throwable, String>() {
+		deferredManager.when(task).then(null, new FailFilter() {
 			@Override
-			public String filterFail(Throwable result) {
-				return result.getMessage();
+			public Throwable filterFail(Throwable result) {
+				return result;
 			}
-		}).fail(new FailCallback<String>() {
+		}).fail(new FailCallback() {
 			@Override
-			public void onFail(String result) {
-				holder.set(result);
+			public void onFail(Throwable result) {
+				holder.set(result.getMessage());
 			}
 		});
 		

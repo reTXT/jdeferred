@@ -16,13 +16,14 @@
 package org.jdeferred.impl;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
-import org.jdeferred.DoneCallback;
-import org.jdeferred.DonePipe;
-import org.jdeferred.FailCallback;
-import org.jdeferred.FailPipe;
-import org.jdeferred.Promise;
+import javafx.scene.media.VideoTrack;
+import org.jdeferred.*;
 import org.junit.Test;
+import org.junit.experimental.theories.suppliers.TestedOn;
+
+import static org.jdeferred.Promises.rejectedPromise;
 
 public class PipedPromiseTest extends AbstractDeferredTest {
 	@Test
@@ -36,11 +37,11 @@ public class PipedPromiseTest extends AbstractDeferredTest {
 			}
 		};
 		
-		deferredManager.when(task).then(new DonePipe<Integer, Integer, Void, Void>() {
+		deferredManager.when(task).then(new DonePipe<Integer, Integer, Void>() {
 			@Override
-			public Promise<Integer, Void, Void> pipeDone(Integer result) {
+			public Promise<Integer, Void> pipeDone(Integer result) {
 				preRewireValue.set(result);
-				return new DeferredObject<Integer, Void, Void>().resolve(1000);
+				return new DeferredObject<Integer, Void>().resolve(1000);
 			}
 		}).done(new DoneCallback<Integer>() {
 			@Override
@@ -65,16 +66,16 @@ public class PipedPromiseTest extends AbstractDeferredTest {
 			}
 		};
 		
-		deferredManager.when(task).then(null, new FailPipe<Throwable, Integer, String, Void>() {
+		deferredManager.when(task).then(null, new FailPipe<Integer, Void>() {
 			@Override
-			public Promise<Integer, String, Void> pipeFail(Throwable result) {
+			public Promise<Integer, Void> pipeFail(Throwable result) {
 				preRewireValue.set(result.getMessage());
-				return new DeferredObject<Integer, String, Void>().reject("ouch");
+				return new DeferredObject<Integer, Void>().reject(new RuntimeException("ouch"));
 			}
-		}).fail(new FailCallback<String>() {
+		}).fail(new FailCallback() {
 			@Override
-			public void onFail(String result) {
-				postRewireValue.set(result);
+			public void onFail(Throwable result) {
+				postRewireValue.set(result.getMessage());
 			}
 		});
 		
@@ -94,19 +95,19 @@ public class PipedPromiseTest extends AbstractDeferredTest {
 			}
 		};
 		
-		deferredManager.when(task).then(null, new FailPipe<Throwable, Integer, String, Void>() {
+		deferredManager.when(task).then(null, new FailPipe<Integer, Void>() {
 			@Override
-			public Promise<Integer, String, Void> pipeFail(Throwable result) {
-				return new DeferredObject<Integer, String, Void>().reject("ouch");
+			public Promise<Integer, Void> pipeFail(Throwable result) {
+				return new DeferredObject<Integer, Void>().reject(new RuntimeException("ouch"));
 			}
 		}).done(new DoneCallback<Integer>() {
 			@Override
 			public void onDone(Integer result) {
 				postRewireValue.set(result);
 			}
-		}).fail(new FailCallback<String>() {
+		}).fail(new FailCallback() {
 			@Override
-			public void onFail(String result) {
+			public void onFail(Throwable result) {
 				failed.set(true);
 			}
 		});
@@ -126,14 +127,14 @@ public class PipedPromiseTest extends AbstractDeferredTest {
 			public Integer call() {
 				return 10;
 			}
-		}).then(new DonePipe<Integer, Integer, String, Void>() {
+		}).then(new DonePipe<Integer, Integer, Void>() {
 			@Override
-			public Promise<Integer, String, Void> pipeDone(Integer result) {
+			public Promise<Integer, Void> pipeDone(Integer result) {
 				preRewireValue.set(result);
 				if (result < 100) {
-					return new DeferredObject<Integer, String, Void>().reject("less than 100");
+					return new DeferredObject<Integer, Void>().reject(new RuntimeException("less than 100"));
 				} else {
-					return new DeferredObject<Integer, String, Void>().resolve(result);
+					return new DeferredObject<Integer, Void>().resolve(result);
 				}
 			}
 		}).done(new DoneCallback<Integer>() {
@@ -141,10 +142,10 @@ public class PipedPromiseTest extends AbstractDeferredTest {
 			public void onDone(Integer result) {
 				postRewireValue.set(result);
 			}
-		}).fail(new FailCallback<String>() {
+		}).fail(new FailCallback() {
 			@Override
-			public void onFail(String result) {
-				failed.set(result);
+			public void onFail(Throwable result) {
+				failed.set(result.getMessage());
 			}
 		});
 		
@@ -153,4 +154,5 @@ public class PipedPromiseTest extends AbstractDeferredTest {
 		postRewireValue.assertEquals(null);
 		failed.assertEquals("less than 100");
 	}
+
 }

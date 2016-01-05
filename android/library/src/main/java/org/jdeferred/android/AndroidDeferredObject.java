@@ -32,7 +32,7 @@ import android.os.Looper;
 import android.os.Handler;
 import android.os.Message;
 
-public class AndroidDeferredObject<D, F, P> extends DeferredObject<D, F, P> {
+public class AndroidDeferredObject<D, P> extends DeferredObject<D, P> {
 	private static final InternalHandler sHandler = new InternalHandler();
 
 	private static final int MESSAGE_POST_DONE = 0x1;
@@ -46,14 +46,14 @@ public class AndroidDeferredObject<D, F, P> extends DeferredObject<D, F, P> {
 	private final AndroidExecutionScope defaultAndroidExecutionScope;
 
 	public AndroidDeferredObject() {
-		this(new DeferredObject<D, F, P>());
+		this(new DeferredObject<D, P>());
 	}
 
-	public AndroidDeferredObject(Promise<D, F, P> promise) {
+	public AndroidDeferredObject(Promise<D, P> promise) {
 		this(promise, AndroidExecutionScope.UI);
 	}
 
-	public AndroidDeferredObject(Promise<D, F, P> promise,
+	public AndroidDeferredObject(Promise<D, P> promise,
 			AndroidExecutionScope defaultAndroidExecutionScope) {
 		this.defaultAndroidExecutionScope = defaultAndroidExecutionScope;
 		promise.done(new DoneCallback<D>() {
@@ -66,9 +66,9 @@ public class AndroidDeferredObject<D, F, P> extends DeferredObject<D, F, P> {
 			public void onProgress(P progress) {
 				AndroidDeferredObject.this.notify(progress);
 			}
-		}).fail(new FailCallback<F>() {
+		}).fail(new FailCallback() {
 			@Override
-			public void onFail(F result) {
+			public void onFail(Throwable result) {
 				AndroidDeferredObject.this.reject(result);
 			}
 		});
@@ -82,7 +82,7 @@ public class AndroidDeferredObject<D, F, P> extends DeferredObject<D, F, P> {
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		@Override
 		public void handleMessage(Message msg) {
-			CallbackMessage<?, ?, ?, ?> result = (CallbackMessage<?, ?, ?, ?>) msg.obj;
+			CallbackMessage<?, ?, ?> result = (CallbackMessage<?, ?, ?>) msg.obj;
 			switch (msg.what) {
 			case MESSAGE_POST_DONE:
 				((DoneCallback) result.callback).onDone(result.resolved);
@@ -111,7 +111,7 @@ public class AndroidDeferredObject<D, F, P> extends DeferredObject<D, F, P> {
 		}
 	};
 
-	protected void triggerFail(FailCallback<F> callback, F rejected) {
+	protected void triggerFail(FailCallback callback, Throwable rejected) {
 		if (determineAndroidExecutionScope(callback) == AndroidExecutionScope.UI) {
 			executeInUiThread(MESSAGE_POST_FAIL, callback, State.REJECTED,
 					null, rejected, null);
@@ -129,8 +129,8 @@ public class AndroidDeferredObject<D, F, P> extends DeferredObject<D, F, P> {
 		}
 	};
 
-	protected void triggerAlways(AlwaysCallback<D, F> callback, State state,
-			D resolve, F reject) {
+	protected void triggerAlways(AlwaysCallback<D> callback, State state,
+			D resolve, Throwable reject) {
 		if (determineAndroidExecutionScope(callback) == AndroidExecutionScope.UI) {
 			executeInUiThread(MESSAGE_POST_ALWAYS, callback, state, resolve,
 					reject, null);
@@ -140,9 +140,9 @@ public class AndroidDeferredObject<D, F, P> extends DeferredObject<D, F, P> {
 	};
 
 	protected <Callback> void executeInUiThread(int what, Callback callback,
-			State state, D resolve, F reject, P progress) {
+			State state, D resolve, Throwable reject, P progress) {
 		Message message = sHandler.obtainMessage(what,
-				new CallbackMessage<Callback, D, F, P>(this, callback, state,
+				new CallbackMessage<Callback, D, P>(this, callback, state,
 						resolve, reject, progress));
 		message.sendToTarget();
 	}
@@ -172,7 +172,7 @@ public class AndroidDeferredObject<D, F, P> extends DeferredObject<D, F, P> {
 		} else if (callback instanceof DoneCallback) {
 			return determineAndroidExecutionScope(callback.getClass(), "onDone", Object.class);
 		} else if (callback instanceof FailCallback) {
-			return determineAndroidExecutionScope(callback.getClass(), "onFail", Object.class);
+			return determineAndroidExecutionScope(callback.getClass(), "onFail", Throwable.class);
 		} else if (callback instanceof ProgressCallback) {
 			return determineAndroidExecutionScope(callback.getClass(), "onProgress", Object.class);
 		} else if (callback instanceof AlwaysCallback) {
@@ -182,16 +182,16 @@ public class AndroidDeferredObject<D, F, P> extends DeferredObject<D, F, P> {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static class CallbackMessage<Callback, D, F, P> {
+	private static class CallbackMessage<Callback, D, P> {
 		final Deferred deferred;
 		final Callback callback;
 		final D resolved;
-		final F rejected;
+		final Throwable rejected;
 		final P progress;
 		final State state;
 
 		CallbackMessage(Deferred deferred, Callback callback, State state,
-				D resolved, F rejected, P progress) {
+				D resolved, Throwable rejected, P progress) {
 			this.deferred = deferred;
 			this.callback = callback;
 			this.state = state;

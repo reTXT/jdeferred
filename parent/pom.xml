@@ -16,13 +16,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-		<relativePath />
-	</parent>
-
 	<groupId>org.jdeferred</groupId>
 	<artifactId>jdeferred-parent</artifactId>
 	<version>1.2.5-SNAPSHOT</version>
@@ -33,14 +26,29 @@
 	<inceptionYear>2013</inceptionYear>
 
 	<scm>
-		<connection>scm:git:git@github.com:jdeferred/jdeferred.git</connection>
-		<developerConnection>scm:git:git@github.com:jdeferred/jdeferred.git</developerConnection>
-		<url>git@github.com:jdeferred/jdeferred.git</url>
+		<connection>scm:git:git@github.com:retxt/jdeferred.git</connection>
+		<developerConnection>scm:git:git@github.com:retxt/jdeferred.git</developerConnection>
+		<url>git@github.com:retxt/jdeferred.git</url>
 		<tag>HEAD</tag>
 	</scm>
+	
+  <distributionManagement>
+     <repository>
+       <id>retxt_maven_s3</id>
+       <name>reTXT Maven Release Repository - S3</name>
+       <url>s3://maven.retxt.io/public/release</url>
+       <layout>default</layout>
+     </repository>
+     <snapshotRepository>
+       <id>retxt_maven_s3</id>
+       <name>reTXT Maven Snapshot Repository - S3</name>
+       <url>s3://maven.retxt.io/public/snapshot</url>
+       <layout>default</layout>
+     </snapshotRepository>
+  </distributionManagement>  
 
 	<issueManagement>
-		<url>https://github.com/jdeferred/jdeferred/issues</url>
+		<url>https://github.com/retxt/jdeferred/issues</url>
 	</issueManagement>
 
 	<licenses>
@@ -128,7 +136,7 @@
 				<type>aar</type>
 			</dependency>
 		</dependencies>
-	</dependencyManagement>
+	</dependencyManagement>  
 
 	<build>
 		<pluginManagement>
@@ -174,14 +182,17 @@
 					<artifactId>maven-deploy-plugin</artifactId>
 					<version>${version.maven.deploy}</version>
 				</plugin>
-				<plugin>
-					<groupId>org.sonatype.plugins</groupId>
-					<artifactId>nexus-staging-maven-plugin</artifactId>
-					<version>${version.nexus.staging}</version>
-				</plugin>
       </plugins>
 		</pluginManagement>
 
+    <extensions>
+      <extension>
+    <groupId>org.kuali.maven.wagons</groupId>
+    <artifactId>maven-s3-wagon</artifactId>
+        <version>1.2.1</version>
+      </extension>
+    </extensions>
+     
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -255,15 +266,6 @@
 					</execution>
 				</executions>
 			</plugin>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <serverId>sonatype-nexus-staging</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-        </configuration>
-      </plugin>
 		</plugins>
 	</build>
 </project>

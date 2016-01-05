@@ -24,16 +24,15 @@ import org.jdeferred.DeferredFutureTask;
 import org.jdeferred.DeferredManager;
 import org.jdeferred.DeferredRunnable;
 import org.jdeferred.Promise;
-import org.jdeferred.multiple.MasterProgress;
 import org.jdeferred.multiple.MasterDeferredObject;
+import org.jdeferred.multiple.MasterProgress;
 import org.jdeferred.multiple.MultipleResults;
-import org.jdeferred.multiple.OneReject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public abstract class AbstractDeferredManager implements DeferredManager {
-	final protected Logger log = LoggerFactory.getLogger(AbstractDeferredManager.class);
+	private static final Logger log = LoggerFactory.getLogger(AbstractDeferredManager.class);
 	
 	protected abstract void submit(Runnable runnable);
 	protected abstract void submit(Callable callable);
@@ -54,7 +53,7 @@ public abstract class AbstractDeferredManager implements DeferredManager {
 	public abstract boolean isAutoSubmit();
 	
 	@Override
-	public Promise<MultipleResults, OneReject, MasterProgress> when(Runnable... runnables) {
+	public Promise<MultipleResults, MasterProgress> when(Runnable... runnables) {
 		assertNotEmpty(runnables);
 		
 		Promise[] promises = new Promise[runnables.length];
@@ -70,7 +69,7 @@ public abstract class AbstractDeferredManager implements DeferredManager {
 	}
 
 	@Override
-	public Promise<MultipleResults, OneReject, MasterProgress> when(Callable<?>... callables) {
+	public Promise<MultipleResults, MasterProgress> when(Callable<?>... callables) {
 		assertNotEmpty(callables);
 
 		Promise[] promises = new Promise[callables.length]; 
@@ -86,7 +85,7 @@ public abstract class AbstractDeferredManager implements DeferredManager {
 	}
 	
 	@Override
-	public Promise<MultipleResults, OneReject, MasterProgress> when(DeferredRunnable<?>... runnables) {
+	public Promise<MultipleResults, MasterProgress> when(DeferredRunnable<?>... runnables) {
 		assertNotEmpty(runnables);
 		
 		Promise[] promises = new Promise[runnables.length];
@@ -99,7 +98,7 @@ public abstract class AbstractDeferredManager implements DeferredManager {
 	}
 
 	@Override
-	public Promise<MultipleResults, OneReject, MasterProgress> when(DeferredCallable<?, ?>... callables) {
+	public Promise<MultipleResults, MasterProgress> when(DeferredCallable<?, ?>... callables) {
 		assertNotEmpty(callables);
 
 		Promise[] promises = new Promise[callables.length]; 
@@ -112,7 +111,7 @@ public abstract class AbstractDeferredManager implements DeferredManager {
 	}
 
 	@Override
-	public Promise<MultipleResults, OneReject, MasterProgress> when(DeferredFutureTask<?, ?>... tasks) {
+	public Promise<MultipleResults, MasterProgress> when(DeferredFutureTask<?, ?>... tasks) {
 		assertNotEmpty(tasks);
 
 		Promise[] promises = new Promise[tasks.length];
@@ -124,7 +123,7 @@ public abstract class AbstractDeferredManager implements DeferredManager {
 	}
 
 	@Override
-	public Promise<MultipleResults, OneReject, MasterProgress> when(Future<?> ... futures) {
+	public Promise<MultipleResults, MasterProgress> when(Future<?> ... futures) {
 		assertNotEmpty(futures);
 
 		Promise[] promises = new Promise[futures.length];
@@ -136,33 +135,33 @@ public abstract class AbstractDeferredManager implements DeferredManager {
 	}
 
 	@Override
-	public Promise<MultipleResults, OneReject, MasterProgress> when(Promise... promises) {
+	public Promise<MultipleResults, MasterProgress> when(Promise... promises) {
 		assertNotEmpty(promises);
 		return new MasterDeferredObject(promises).promise();
 	}
 
 	@Override
-	public <D, F, P> Promise<D, F, P> when(Promise<D, F, P> promise) {
+	public <D, P> Promise<D, P> when(Promise<D, P> promise) {
 		return promise;
 	}
 
 	@Override
-	public <P> Promise<Void, Throwable, P> when(DeferredRunnable<P> runnable) {
+	public <P> Promise<Void, P> when(DeferredRunnable<P> runnable) {
 		return when(new DeferredFutureTask<Void, P>(runnable));
 	}
 
 	@Override
-	public <D, P> Promise<D, Throwable, P> when(DeferredCallable<D, P> runnable) {
+	public <D, P> Promise<D, P> when(DeferredCallable<D, P> runnable) {
 		return when(new DeferredFutureTask<D, P>(runnable));
 	}
 	
 	@Override
-	public Promise<Void, Throwable, Void> when(Runnable runnable) {
+	public Promise<Void, Void> when(Runnable runnable) {
 		return when(new DeferredFutureTask<Void, Void>(runnable));
 	}
 
 	@Override
-	public <D> Promise<D, Throwable, Void> when(Callable<D> callable) {
+	public <D> Promise<D, Void> when(Callable<D> callable) {
 		return when(new DeferredFutureTask<D, Void>(callable));
 	}
 
@@ -183,7 +182,7 @@ public abstract class AbstractDeferredManager implements DeferredManager {
 	 * </ul>
 	 */
 	@Override
-	public <D, P> Promise<D, Throwable, P> when(
+	public <D, P> Promise<D, P> when(
 			DeferredFutureTask<D, P> task) {
 		if (task.getStartPolicy() == StartPolicy.AUTO 
 				|| (task.getStartPolicy() == StartPolicy.DEFAULT && isAutoSubmit()))
@@ -193,7 +192,7 @@ public abstract class AbstractDeferredManager implements DeferredManager {
 	}
 	
 	@Override
-	public <D> Promise<D, Throwable, Void> when(final Future<D> future) {
+	public <D> Promise<D, Void> when(final Future<D> future) {
 		// make sure the task is automatically started
 		
 		return when(new DeferredCallable<D, Void>(StartPolicy.AUTO) {

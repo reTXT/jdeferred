@@ -37,9 +37,9 @@ import android.os.AsyncTask;
  */
 public abstract class DeferredAsyncTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result>
 {
-	protected final Logger log = LoggerFactory.getLogger(DeferredAsyncTask.class);
+	protected static final Logger log = LoggerFactory.getLogger(DeferredAsyncTask.class);
 	
-	private final DeferredObject<Result, Throwable, Progress> deferred = new DeferredObject<Result, Throwable, Progress>();
+	private final DeferredObject<Result, Progress> deferred = new DeferredObject<Result, Progress>();
 	private final StartPolicy startPolicy;
 	
 	private Throwable throwable;
@@ -98,7 +98,7 @@ public abstract class DeferredAsyncTask<Params, Progress, Result> extends AsyncT
 		publishProgress(progress);
 	}
 	
-	public Promise<Result, Throwable, Progress> promise() {
+	public Promise<Result, Progress> promise() {
 		return deferred.promise();
 	}
 

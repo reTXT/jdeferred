@@ -55,10 +55,10 @@ import org.jdeferred.Promise;
  * @see ProgressCallback
  * @author Ray Tsang
  */
-public class DeferredObject<D, F, P> extends AbstractPromise<D, F, P> implements Deferred<D, F, P> {
-	
+public class DeferredObject<D, P> extends AbstractPromise<D, P> implements Deferred<D, P> {
+
 	@Override
-	public Deferred<D, F, P> resolve(final D resolve) {
+	public Deferred<D, P> resolve(final D resolve) {
 		synchronized (this) {
 			if (!isPending())
 				throw new IllegalStateException("Deferred object already finished, cannot resolve again");
@@ -76,7 +76,7 @@ public class DeferredObject<D, F, P> extends AbstractPromise<D, F, P> implements
 	}
 
 	@Override
-	public Deferred<D, F, P> notify(final P progress) {
+	public Deferred<D, P> notify(final P progress) {
 		synchronized (this) {
 			if (!isPending())
 				throw new IllegalStateException("Deferred object already finished, cannot notify progress");
@@ -87,7 +87,7 @@ public class DeferredObject<D, F, P> extends AbstractPromise<D, F, P> implements
 	}
 
 	@Override
-	public Deferred<D, F, P> reject(final F reject) {
+	public Deferred<D, P> reject(final Throwable reject) {
 		synchronized (this) {
 			if (!isPending())
 				throw new IllegalStateException("Deferred object already finished, cannot reject again");

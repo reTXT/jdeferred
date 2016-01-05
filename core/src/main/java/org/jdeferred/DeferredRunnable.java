@@ -13,7 +13,7 @@ import org.jdeferred.impl.DeferredObject;
  * @param <P> Type used for {@link Deferred#notify(Object)}
  */
 public abstract class DeferredRunnable<P> implements Runnable {
-	private final Deferred<Void, Throwable, P> deferred = new DeferredObject<Void, Throwable, P>();
+	private final Deferred<Void, P> deferred = new DeferredObject<Void, P>();
 	private final StartPolicy startPolicy;
 	
 	public DeferredRunnable() {
@@ -32,7 +32,7 @@ public abstract class DeferredRunnable<P> implements Runnable {
 		deferred.notify(progress);
 	}
 	
-	protected Deferred<Void, Throwable, P> getDeferred() {
+	protected Deferred<Void, P> getDeferred() {
 		return deferred;
 	}
 
