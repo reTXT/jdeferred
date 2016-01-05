@@ -53,7 +53,11 @@ public class DeferredPromise<D, P> implements Promise<D, P> {
 		return promise.isRejected();
 	}
 
-	public Promise<D, F, P> then(DoneCallback<D> doneCallback) {
+	public boolean isCancelled() {
+		return promise.isCancelled();
+	}
+
+	public Promise<D, P> then(DoneCallback<D> doneCallback) {
 		return promise.then(doneCallback);
 	}
 

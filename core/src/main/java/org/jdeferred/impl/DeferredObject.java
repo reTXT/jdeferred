@@ -103,7 +103,17 @@ public class DeferredObject<D, P> extends AbstractPromise<D, P> implements Defer
 		return this;
 	}
 
-	public Promise<D, F, P> promise() {
+	@Override
+	public Deferred<D, P> cancel() {
+		synchronized (this) {
+			if (!isPending())
+				throw new IllegalStateException("Deferred object already finished, cannot cancel again");
+			this.state = State.CANCELLED;
+		}
+		return this;
+	}
+
+	public Promise<D, P> promise() {
 		return this;
 	}
 }

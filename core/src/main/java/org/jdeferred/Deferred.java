@@ -108,6 +108,13 @@ public interface Deferred<D, P> extends Promise<D, P> {
 	Deferred<D, P> notify(final P progress);
 
 	/**
+	 * This should be called when a task wants to cancel any further promise handling.
+	 *
+	 * @return chainable deferred object
+	 */
+	Deferred<D, P> cancel();
+
+	/**
 	 * Return an {@link Promise} instance (i.e., an observer).  You can register callbacks in this observer.
 	 * 
 	 * @return a {@link Promise} instance (i.e., an observer).  You can register callbacks in this observer.

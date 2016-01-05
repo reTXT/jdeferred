@@ -31,44 +31,64 @@ public class PipedPromise<D, P, D_OUT, P_OUT> extends DeferredObject<D_OUT, P_OU
 			@SuppressWarnings("unchecked")
 			@Override
 			public void onDone(D result) {
-				if (doneFilter != null) pipe(doneFilter.pipeDone(result));
-				else PipedPromise.this.resolve((D_OUT) result);
-				
+		        if (donePipe != null)
+					try {
+						pipe(donePipe.pipeDone(result));
+					} catch (CancellationException e) {
+						PipedPromise.this.cancel();
+					} catch (Exception e) {
+						PipedPromise.this.reject(e);
+					}
+	            else PipedPromise.this.resolve((D_OUT) result);
 			}
 		}).fail(new FailCallback() {
 			@Override
 			public void onFail(Throwable result) {
-				if (failFilter != null)  pipe(failFilter.pipeFail(result));
-				else PipedPromise.this.reject((F_OUT) result);
+				if (failPipe != null)
+					try {
+						pipe(failPipe.pipeFail(result));
+					} catch (CancellationException e) {
+						PipedPromise.this.cancel();
+					}
+				else PipedPromise.this.reject(result);
 			}
 		}).progress(new ProgressCallback<P>() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void onProgress(P progress) {
-				if (progressFilter != null) pipe(progressFilter.pipeProgress(progress));
+				if (progressPipe != null)
+					try {
+						pipe(progressPipe.pipeProgress(progress));
+					} catch (CancellationException e) {
+						PipedPromise.this.cancel();
+					}
 				else PipedPromise.this.notify((P_OUT) progress);
 			}
 		});
 	}
 	
 	protected Promise<D_OUT, P_OUT> pipe(Promise<D_OUT, P_OUT> promise) {
-		promise.done(new DoneCallback<D_OUT>() {
-			@Override
-			public void onDone(D_OUT result) {
-				PipedPromise.this.resolve(result);
-			}
-		}).fail(new FailCallback<F_OUT>() {
-			@Override
-			public void onFail(F_OUT result) {
-				PipedPromise.this.reject(result);
-			}
-		}).progress(new ProgressCallback<P_OUT>() {
-			@Override
-			public void onProgress(P_OUT progress) {
-				PipedPromise.this.notify(progress);
-			}
-		});
-		
+		if (promise.isCancelled()) {
+			cancel();
+		}
+		else {
+			promise.done(new DoneCallback<D_OUT>() {
+				@Override
+				public void onDone(D_OUT result) {
+					PipedPromise.this.resolve(result);
+				}
+			}).fail(new FailCallback() {
+				@Override
+				public void onFail(Throwable result) {
+					PipedPromise.this.reject(result);
+				}
+			}).progress(new ProgressCallback<P_OUT>() {
+				@Override
+				public void onProgress(P_OUT progress) {
+					PipedPromise.this.notify(progress);
+				}
+			});
+		}
 		return promise;
 	}
 }

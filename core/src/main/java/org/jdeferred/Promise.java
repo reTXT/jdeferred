@@ -72,7 +72,15 @@ public interface Promise<D, P> {
 		 * 
 		 * @see Deferred#resolve(Object)
 		 */
-		RESOLVED
+		RESOLVED,
+
+		/**
+		 * The Promise has finished running successfully,
+		 * It should skip all other processing.
+		 *
+		 * @see Deferred#cancel()
+		 */
+		CANCELLED
 	}
 
 	public State state();
@@ -94,6 +102,12 @@ public interface Promise<D, P> {
 	 * @return
 	 */
 	public boolean isRejected();
+
+	/**
+	 * @see State#CANCELLED
+	 * @return
+	 */
+	public boolean isCancelled();
 
 	/**
 	 * Equivalent to {@link #done(DoneCallback)}

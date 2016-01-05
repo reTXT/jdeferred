@@ -237,7 +237,12 @@ public abstract class AbstractPromise<D, P> implements Promise<D, P> {
 	public boolean isRejected() {
 		return state == State.REJECTED;
 	}
-	
+
+	@Override
+	public boolean isCancelled() {
+		return state == State.CANCELLED;
+	}
+
 	public void waitSafely() throws InterruptedException {
 		waitSafely(-1);
 	}
